@@ -1,0 +1,40 @@
+# Workflow para desplegar la Landing Page en GitHub Pages
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Se ejecuta cuando haces push a la rama main
+  workflow_dispatch: # Permite ejecutar el flujo manualmente desde la pestaña Actions
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Sube todo el contenido del repositorio (donde está index.html)
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
